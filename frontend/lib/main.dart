@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
-import 'screens/flight_search_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../screens/home_screen.dart';
+import '../screens/search_screen.dart';
+import '../screens/booking_screen.dart';
 
 void main() {
-  runApp(const InternationalFlightBookingApp());
+  runApp(InternationalFlightBookingApp());
 }
 
 class InternationalFlightBookingApp extends StatelessWidget {
-  const InternationalFlightBookingApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'International Flight Booking',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const FlightSearchScreen(),
+      theme: ThemeData(primarySwatch: Colors.blue),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomeScreen(),
+        '/search': (context) => SearchScreen(),
+        '/booking': (context) => BookingScreen(),
+      },
     );
   }
 }

@@ -1,43 +1,39 @@
-# routes/flight_routes.py
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List
-from ..models.flight import FlightSearchRequest, FlightSearchResponse, Flight
+from fastapi import APIRouter, HTTPException
+from ..models.flight import Flight
+from datetime import datetime
 
-router = APIRouter(prefix="/flights", tags=["flights"])
+router = APIRouter()
 
-# Dummy in-memory flight data for demo purposes
-FAKE_FLIGHTS = [
+# Mock data store
+_flights = [
     Flight(
         flight_id="FL123",
-        airline="Delta",
-        origin="JFK",
+        airline="Air Korea",
+        origin="ICN",
         destination="LHR",
-        departure_time="2024-07-01T08:00:00Z",
-        arrival_time="2024-07-01T20:00:00Z",
-        duration_minutes=480,
-        price=650.0,
+        departure_time=datetime(2024, 10, 1, 10, 0),
+        arrival_time=datetime(2024, 10, 1, 20, 0),
+        price=350.0,
         layovers=0,
-        seats_available=10,
+        duration_minutes=600,
     ),
     Flight(
         flight_id="FL456",
         airline="British Airways",
-        origin="JFK",
+        origin="ICN",
         destination="LHR",
-        departure_time="2024-07-01T12:00:00Z",
-        arrival_time="2024-07-01T22:00:00Z",
-        duration_minutes=480,
-        price=700.0,
-        layovers=0,
-        seats_available=5,
+        departure_time=datetime(2024, 10, 1, 12, 0),
+        arrival_time=datetime(2024, 10, 1, 22, 0),
+        price=400.0,
+        layovers=1,
+        duration_minutes=720,
     ),
 ]
 
-@router.post("/search", response_model=FlightSearchResponse)
-async def search_flights(request: FlightSearchRequest):
-    # In a real implementation, query the database or external API
-    # Here we simply filter the FAKE_FLIGHTS list
-    results = [f for f in FAKE_FLIGHTS if f.origin == request.origin and f.destination == request.destination]
+@router.get("/search", response_model=list[Flight])
+async def search_flights(origin: str, destination: str, date: str, passengers: int = 1):
+    # Simplified search logic
+    results = [f for f in _flights if f.origin == origin and f.destination == destination]
     if not results:
         raise HTTPException(status_code=404, detail="No flights found")
-    return FlightSearchResponse(flights=results)
+    return results

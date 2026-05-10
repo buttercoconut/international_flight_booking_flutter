@@ -1,19 +1,20 @@
-# routes/booking_routes.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from ..models.booking import Booking
-from ..models.flight import Flight
+from datetime import datetime
 
-router = APIRouter(prefix="/bookings", tags=["bookings"])
+router = APIRouter()
 
-# In-memory storage for demo
-FAKE_BOOKINGS = []
+# Mock booking store
+_bookings = []
 
 @router.post("/create", response_model=Booking)
-async def create_booking(booking: Booking):
-    # In a real system, validate flight availability, deduct seats, etc.
-    FAKE_BOOKINGS.append(booking)
+async def create_booking(user_id: str, flight_id: str):
+    booking = Booking(
+        booking_id="BK" + datetime.utcnow().strftime("%Y%m%d%H%M%S"),
+        user_id=user_id,
+        flight_id=flight_id,
+        booking_time=datetime.utcnow(),
+        status="confirmed",
+    )
+    _bookings.append(booking)
     return booking
-
-@router.get("/list", response_model=list[Booking])
-async def list_bookings():
-    return FAKE_BOOKINGS
