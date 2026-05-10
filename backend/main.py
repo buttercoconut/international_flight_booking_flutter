@@ -1,10 +1,4 @@
-"""FastAPI application entry point.
-
-The app imports the routers defined in the `routes` package and exposes
-the API under the `/api` prefix. CORS middleware is added to allow
-requests from the Flutter web client.
-"""
-
+# main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,7 +7,7 @@ from .routes.booking_routes import router as booking_router
 
 app = FastAPI(title="International Flight Booking API")
 
-# Allow all origins for demo; tighten in production
+# Allow CORS for frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,9 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(flight_router, prefix="/api")
-app.include_router(booking_router, prefix="/api")
+app.include_router(flight_router)
+app.include_router(booking_router)
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the International Flight Booking API"}

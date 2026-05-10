@@ -1,11 +1,8 @@
-"""Pydantic model for Airline.
-"""
+# models/airline.py
+from pydantic import BaseModel
 
-from pydantic import BaseModel, Field
-
-class AirlineBase(BaseModel):
-    code: str = Field(..., example="AA")
-    name: str = Field(..., example="American Airlines")
-
-class AirlineRead(AirlineBase):
-    id: int
+class Airline(BaseModel):
+    airline_id: str
+    name: str
+    country: str
+    iata_code: str

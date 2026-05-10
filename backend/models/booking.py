@@ -1,18 +1,12 @@
-"""Pydantic model for Booking.
-"""
+# models/booking.py
+from pydantic import BaseModel
+from typing import List
 
-from datetime import datetime
-from pydantic import BaseModel, Field
-
-class BookingBase(BaseModel):
-    user_id: int = Field(..., example=1)
-    flight_id: int = Field(..., example=42)
-    passengers: int = Field(..., ge=1, le=9, example=1)
-    total_price: float = Field(..., example=350.0)
-    booking_time: datetime = Field(default_factory=datetime.utcnow)
-
-class BookingCreate(BookingBase):
-    pass
-
-class BookingRead(BookingBase):
-    id: int
+class Booking(BaseModel):
+    booking_id: str
+    user_id: str
+    flight_id: str
+    passengers: int
+    total_price: float
+    status: str  # e.g., 'confirmed', 'cancelled'
+    booking_time: str  # ISO 8601

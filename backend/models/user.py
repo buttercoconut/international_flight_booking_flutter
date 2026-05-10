@@ -1,14 +1,9 @@
-"""Pydantic model for User.
-"""
+# models/user.py
+from pydantic import BaseModel, EmailStr
 
-from pydantic import BaseModel, EmailStr, Field
-
-class UserBase(BaseModel):
-    email: EmailStr = Field(..., example="user@example.com")
-    full_name: str = Field(..., example="John Doe")
-
-class UserCreate(UserBase):
-    password: str = Field(..., min_length=8)
-
-class UserRead(UserBase):
-    id: int
+class User(BaseModel):
+    user_id: str
+    email: EmailStr
+    full_name: str
+    phone: str
+    # password hash would be stored securely

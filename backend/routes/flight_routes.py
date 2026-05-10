@@ -1,49 +1,43 @@
-"""FastAPI routes for flight search.
-
-This module implements a simple flight search endpoint that calls a stubbed
-service. In a real implementation you would call the Amadeus/Sabre API
-and map the response to the FlightRead model.
-"""
-
+# routes/flight_routes.py
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-
-from ..config import settings
-from ..models.flight import FlightRead, FlightSearchRequest
+from ..models.flight import FlightSearchRequest, FlightSearchResponse, Flight
 
 router = APIRouter(prefix="/flights", tags=["flights"])
 
-# Stubbed flight service – replace with real API client
-class FlightService:
-    def search(self, request: FlightSearchRequest) -> List[FlightRead]:
-        # In a real scenario, validate request, call external API, parse
-        # and return a list of FlightRead objects.
-        # Here we just return a static list for demonstration.
-        dummy_flight = FlightRead(
-            id=1,
-            flight_number="AA1234",
-            airline_code="AA",
-            departure_airport=request.origin,
-            arrival_airport=request.destination,
-            departure_time="2024-07-01T08:00:00Z",
-            arrival_time="2024-07-01T20:00:00Z",
-            price=350.0,
-            currency="USD",
-            layovers=0,
-        )
-        return [dummy_flight]
+# Dummy in-memory flight data for demo purposes
+FAKE_FLIGHTS = [
+    Flight(
+        flight_id="FL123",
+        airline="Delta",
+        origin="JFK",
+        destination="LHR",
+        departure_time="2024-07-01T08:00:00Z",
+        arrival_time="2024-07-01T20:00:00Z",
+        duration_minutes=480,
+        price=650.0,
+        layovers=0,
+        seats_available=10,
+    ),
+    Flight(
+        flight_id="FL456",
+        airline="British Airways",
+        origin="JFK",
+        destination="LHR",
+        departure_time="2024-07-01T12:00:00Z",
+        arrival_time="2024-07-01T22:00:00Z",
+        duration_minutes=480,
+        price=700.0,
+        layovers=0,
+        seats_available=5,
+    ),
+]
 
-# Dependency that would normally provide a DB session or an API client
-async def get_flight_service() -> FlightService:
-    return FlightService()
-
-@router.post("/search", response_model=List[FlightRead])
-async def search_flights(
-    request: FlightSearchRequest,
-    service: FlightService = Depends(get_flight_service),
-):
-    try:
-        flights = service.search(request)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    return flights
+@router.post("/search", response_model=FlightSearchResponse)
+async def search_flights(request: FlightSearchRequest):
+    # In a real implementation, query the database or external API
+    # Here we simply filter the FAKE_FLIGHTS list
+    results = [f for f in FAKE_FLIGHTS if f.origin == request.origin and f.destination == request.destination]
+    if not results:
+        raise HTTPException(status_code=404, detail="No flights found")
+    return FlightSearchResponse(flights=results)

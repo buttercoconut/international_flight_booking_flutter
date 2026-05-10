@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:international_flight_booking_flutter/screens/flight_search_screen.dart';
+import 'screens/flight_search_screen.dart';
 
 void main() {
   runApp(const InternationalFlightBookingApp());
