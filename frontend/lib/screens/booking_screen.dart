@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:international_flight_booking/services/api_service.dart';
-import 'package:provider/provider.dart';
 
 class BookingScreen extends StatefulWidget {
-  const BookingScreen({Key? key}) : super(key: key);
+  final Flight flight;
+  const BookingScreen({super.key, required this.flight});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -12,37 +12,39 @@ class BookingScreen extends StatefulWidget {
 class _BookingScreenState extends State<BookingScreen> {
   final _nameController = TextEditingController();
   final _passportController = TextEditingController();
-  final _emailController = TextEditingController();
-  bool _isSubmitting = false;
+  bool _isLoading = false;
+
+  Future<void> _book() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final booking = await ApiService.bookFlight(
+        flightId: widget.flight.id,
+        passengerName: _nameController.text,
+        passportNumber: _passportController.text,
+      );
+      Navigator.pushReplacementNamed(
+        context,
+        '/confirmation',
+        arguments: booking,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking failed: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _passportController.dispose();
-    _emailController.dispose();
     super.dispose();
-  }
-
-  Future<void> _submitBooking() async {
-    setState(() {
-      _isSubmitting = true;
-    });
-    final api = Provider.of<ApiService>(context, listen: false);
-    final success = await api.bookFlight(
-      passengerName: _nameController.text,
-      passportNumber: _passportController.text,
-      email: _emailController.text,
-    );
-    setState(() {
-      _isSubmitting = false;
-    });
-    if (success) {
-      Navigator.pushReplacementNamed(context, '/confirmation');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Booking failed. Please try again.')),
-      );
-    }
   }
 
   @override
@@ -55,25 +57,30 @@ class _BookingScreenState extends State<BookingScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            Text('Flight: ${widget.flight.flightNumber}'),
+            const SizedBox(height: 16),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Full Name'),
+              decoration: const InputDecoration(labelText: 'Passenger Name'),
             ),
             TextField(
               controller: _passportController,
               decoration: const InputDecoration(labelText: 'Passport Number'),
             ),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _book,
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Confirm Booking'),
             ),
-            const SizedBox(height: 20),
-            _isSubmitting
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _submitBooking,
-                    child: const Text('Confirm Booking'),
-                  ),
           ],
         ),
       ),
