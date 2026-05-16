@@ -1,13 +1,10 @@
 from fastapi import FastAPI
-from .routes import flight_routes, booking_routes, payment_routes
-from .config import settings
+from routes.flight_routes import router as flight_router
 
-app = FastAPI(title=settings.APP_NAME)
+app = FastAPI(title="International Flight Booking API")
 
-app.include_router(flight_routes.router, prefix="/flights", tags=["flights"])
-app.include_router(booking_routes.router, prefix="/bookings", tags=["bookings"])
-app.include_router(payment_routes.router, prefix="/payments", tags=["payments"])
+app.include_router(flight_router, prefix="/api/v1")
 
-@app.get("/")
-async def read_root():
-    return {"message": "Welcome to International Flight Booking API"}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

@@ -1,10 +1,7 @@
-from pydantic import BaseSettings
+# Configuration for the backend service
+# You can extend this file to include database URLs, secret keys, etc.
 
-class Settings(BaseSettings):
-    APP_NAME: str = "International Flight Booking"
-    DATABASE_URL: str = "postgresql://user:password@localhost:5432/flightdb"
-    SECRET_KEY: str = "supersecretkey"
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
-settings = Settings()
+DATABASE_URL = "postgresql://user:password@localhost:5432/flightdb"
+SECRET_KEY = "super-secret-key"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30

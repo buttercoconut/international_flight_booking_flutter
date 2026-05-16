@@ -1,0 +1,5 @@
+# requirements.txt for backend
+fastapi
+uvicorn
+pydantic
+python-multipart
