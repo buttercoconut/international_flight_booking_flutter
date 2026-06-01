@@ -1,8 +1,14 @@
-# models/airline.py
 from pydantic import BaseModel
 
-class Airline(BaseModel):
-    airline_id: str
+class AirlineBase(BaseModel):
     name: str
     country: str
-    iata_code: str
+
+class AirlineCreate(AirlineBase):
+    pass
+
+class Airline(AirlineBase):
+    id: int
+
+    class Config:
+        orm_mode = True

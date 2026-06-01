@@ -1,20 +1,20 @@
-from fastapi import APIRouter, HTTPException
-from ..models.booking import Booking
+from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+from ..models.booking import Booking, BookingCreate
 from datetime import datetime
 
 router = APIRouter()
 
-# Mock booking store
-_bookings = []
+# In-memory booking store
+_bookings: List[Booking] = []
 
 @router.post("/create", response_model=Booking)
-async def create_booking(user_id: str, flight_id: str):
-    booking = Booking(
-        booking_id="BK" + datetime.utcnow().strftime("%Y%m%d%H%M%S"),
-        user_id=user_id,
-        flight_id=flight_id,
-        booking_time=datetime.utcnow(),
-        status="confirmed",
-    )
-    _bookings.append(booking)
-    return booking
+async def create_booking(booking: BookingCreate):
+    new_id = len(_bookings) + 1
+    new_booking = Booking(id=new_id, **booking.dict(), status="confirmed", booking_time=datetime.utcnow())
+    _bookings.append(new_booking)
+    return new_booking
+
+@router.get("/list", response_model=List[Booking])
+async def list_bookings():
+    return _bookings

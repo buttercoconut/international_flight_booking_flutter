@@ -1,47 +1,27 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List
 from datetime import datetime
-from models.flight import Flight
+from ..models.flight import Flight, FlightCreate
+from ..config import settings
 
 router = APIRouter()
 
-# Dummy data store
-_dummy_flights = [
-    Flight(
-        flight_id="FL123",
-        airline="Delta",
-        origin="JFK",
-        destination="LHR",
-        departure_time=datetime(2024, 6, 15, 22, 0),
-        arrival_time=datetime(2024, 6, 16, 10, 0),
-        price=850.0,
-        layovers=0,
-        duration_minutes=420,
-    ),
-    Flight(
-        flight_id="FL456",
-        airline="British Airways",
-        origin="JFK",
-        destination="LHR",
-        departure_time=datetime(2024, 6, 15, 23, 30),
-        arrival_time=datetime(2024, 6, 16, 11, 30),
-        price=900.0,
-        layovers=1,
-        duration_minutes=480,
-    ),
-]
+# In-memory flight store for demo purposes
+_flights: List[Flight] = []
 
-@router.get("/flights", response_model=List[Flight])
+# Seed some flights
+_flights.append(Flight(id=1, flight_number="AA101", airline_id=1, origin="JFK", destination="LHR", departure_time=datetime(2024, 10, 1, 8, 0), arrival_time=datetime(2024, 10, 1, 20, 0), price=750.0, seats_available=150))
+_flights.append(Flight(id=2, flight_number="BA202", airline_id=2, origin="JFK", destination="LHR", departure_time=datetime(2024, 10, 1, 9, 0), arrival_time=datetime(2024, 10, 1, 21, 0), price=800.0, seats_available=120))
+
+@router.get("/search", response_model=List[Flight])
 async def search_flights(
-    origin: str = Query(..., description="IATA code of origin airport"),
-    destination: str = Query(..., description="IATA code of destination airport"),
-    date: datetime = Query(..., description="Departure date (YYYY-MM-DD)"),
-    passengers: int = Query(1, ge=1, le=9, description="Number of passengers"),
+    origin: str = Query(..., description="Departure airport code"),
+    destination: str = Query(..., description="Arrival airport code"),
+    date: datetime = Query(..., description="Flight date"),
+    passengers: int = Query(1, ge=1, description="Number of passengers"),
 ):
-    """Search for flights matching the criteria.
-    In a real implementation this would query an external airline API or a database.
-    """
-    results = [f for f in _dummy_flights if f.origin == origin and f.destination == destination and f.departure_time.date() == date.date()]
+    """Simple flight search filtering the in-memory list."""
+    results = [f for f in _flights if f.origin == origin and f.destination == destination and f.departure_time.date() == date.date()]
     if not results:
-        raise HTTPException(status_code=404, detail="No flights found for the given criteria")
+        raise HTTPException(status_code=404, detail="No flights found")
     return results

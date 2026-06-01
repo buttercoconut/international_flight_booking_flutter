@@ -1,10 +1,18 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-class Booking(BaseModel):
-    booking_id: str
-    user_id: str
-    flight_id: str
+class BookingBase(BaseModel):
+    user_id: int
+    flight_id: int
+    passengers: int
     booking_time: datetime
+
+class BookingCreate(BookingBase):
+    pass
+
+class Booking(BookingBase):
+    id: int
     status: str
-    # Additional fields like seat, class, etc.
+
+    class Config:
+        orm_mode = True

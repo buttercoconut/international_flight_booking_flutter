@@ -1,9 +1,15 @@
-# models/user.py
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
-class User(BaseModel):
-    user_id: str
-    email: EmailStr
+class UserBase(BaseModel):
+    email: str
     full_name: str
-    phone: str
-    # password hash would be stored securely
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+    is_active: bool = True
+
+    class Config:
+        orm_mode = True

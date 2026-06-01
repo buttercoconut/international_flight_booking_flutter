@@ -1,1 +1,1 @@
-# __init__.py for backend package
+"""Backend package for the flight booking API."""
