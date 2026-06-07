@@ -1,8 +1,10 @@
-from pydantic import BaseModel
+"""Pydantic models for User entity."""
+
+from pydantic import BaseModel, Field, EmailStr
 
 class UserBase(BaseModel):
-    email: str
-    full_name: str
+    email: EmailStr
+    full_name: str = Field(..., example="John Doe")
 
 class UserCreate(UserBase):
     password: str
